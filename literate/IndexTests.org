@@ -1,0 +1,20 @@
+#+TITLE: Index Tests
+#+PROPERTY: header-args    :comments both :tangle ../test/index.test.js
+
+* Preamble
+
+#+begin_src js
+import { InvertedPromise } from "../src/InvertedPromise";
+import * as Index from "../src/index";
+#+end_src
+* Tests
+
+#+begin_src js
+it("Everything is defined", () => {
+    expect(Index.InvertedPromise).toBeDefined();
+})
+
+it("Exposes everything", () => {
+    expect(Index.InvertedPromise).toBe(InvertedPromise);
+})
+#+end_src
