@@ -1,0 +1,87 @@
+#+TITLE: Inverted Promise JS Module
+
+Small no-dependency module which inverts the signature of [[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise][standard JS Promises]].
+
+Standard promises take a callback with signature =(resolve, reject) -> void=. Promises created from this module do not require a callback, nor do they require the use of the =new= keyword. If not passed a callback on creation, these promises offer two methods: =.reject()= and =.resolve()=. These new methods work exactly as the parameters of the callback.
+
+If supplied a callback on creation, this promise returns a built-in =Promise=, so this module is a superset of the built-in =Promise=.
+
+* How to install from GitHub
+
+#+begin_src sh 
+npm install -D https://github.com/reedspool/inverted-promise
+#+end_src
+
+* Usage
+
+Shadow built-in Promise with this module:
+
+#+begin_src js
+import { InvertedPromise as Promise } from "inverted-promise";
+#+end_src
+
+This module does not require the =new= keyword nor the callback, but both are allowed to facilitate shadowing in existing projects.
+
+#+begin_src js
+const promise = Promise();
+#+end_src
+
+The returned object is /just/ a built-in =Promise= with the two additional methods. Call =.then()= or =.catch()=, =await= it, or do anything else you would do with a normal promise.
+
+Call either =.reject()= or =.resolve()= later. If you call the other one after that, nothing will happen since the =Promise= is already fulfilled.
+
+#+begin_src js
+promise.then(console.log);       // Does nothing yet, not resolved
+promise.resolve("Hello World");  // Now the log will print this string
+promise.reject(new Error("This will have no effect"));
+#+end_src
+
+* How to edit
+
+This modules is in Emacs Org-Mode in Literate Programming (LP) style using Babel.
+
+You can edit the JavaScript in the =src= directory directly and disregard the above.
+
+Alternatively, you can edit the =.org= files in the =literate= directory. To update the =.js= files in the =src= directory with your changes, do these two steps for *each* file edited:
+
+1. Move your pointer to the line at the top of the file which starts with =#+PROPERTY: header-args= and hit =C-c C-c= to refresh your local setup. You only need to do this the first time you edit this file.
+2. Execute =M-x org-babel-tangle= in Emacs.
+
+You may use either option to submit a Pull Request. If you edit the JS directly, I may reject the Pull Request and make the same changes in the literate style. If so, I will credit you.
+
+* Explanation for miscellaneous files
+** =babel.config.js=
+:PROPERTIES:
+:header-args: :comments both :tangle babel.config.js
+:END:
+
+Line-by-line, starting at the beginning:
+
+#+begin_src js
+module.exports = {
+#+end_src
+
+Jest unfortunately does not work out of the box with =import= syntax.
+
+I solved this issue by adding a single dependency, =@babel/preset-env,= and a single file, =babel.config.js=:
+
+#+begin_src js
+    presets: [ "@babel/preset-env" ],
+#+end_src
+
+When I started using async/await inside my Jest tests, I got this error:
+
+=ReferenceError: regeneratorRuntime is not defined=
+
+[[https://github.com/facebook/jest/issues/3126#issuecomment-723998132][This github comment]] suggested the following remedy:
+
+#+begin_src js
+    targets: { node: 'current' },
+#+end_src
+
+And finally:
+
+#+begin_src js
+};
+#+end_src
+
